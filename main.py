@@ -174,6 +174,8 @@ def extractFeatures():
 		followerCounts = collections.Counter() # init each day in the set to have 0 follower count
 		retweetCounts = collections.Counter() # init each day in the set to have 0 retweets
 
+		countIndex = [i for i, val in enumerate(playerCounts) if val["Game"] == game][0]
+
 		with open(trainFiles[index]) as d:
 			for line in d:
 				item = json.loads(line)
@@ -204,10 +206,14 @@ def extractFeatures():
 				followerCounts[day] += item['user']['followers_count']
 
 		# Build the feature vector for each day
-		for i in xrange(len(tweetCounts)):
-			feat = [tweetCounts[i], len(users[i]), float(favoriteCounts[i]) / tweetCounts[i], float(followerCounts[i]) / len(users[i]), float(retweetCounts[i]) / tweetCounts[i]]
+		for i in xrange(31):
+			favAvg = float(favoriteCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
+			followAvg = float(followerCounts[i]) / len(users[i]) if len(users[i]) > 0 else 0
+			retweetAvg = float(retweetCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
+			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg]
 			formatDate = '08/' + (('0' + str(i+1)) if i+1 < 10 else str(i+1)) + '/15'
-			features.append((feat, playerCounts[game][formatDate]))
+			features.append((feat, playerCounts[countIndex]["Peak Player"][formatDate]))
+		print len(features)
 
 		trainResults[game] = features[:10]
 		testResults[game] = features[10:]

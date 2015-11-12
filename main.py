@@ -1,8 +1,8 @@
 import sys, os, os.path, time, collections
 import json
 import re
-# import twitterAccess as tw
-# from TwitterAPI import TwitterAPI
+import twitterAccess as tw
+from TwitterAPI import TwitterAPI
 
 numTweets = 1000
 trackTweets = ['Fallout4', 'LeagueofLegends,lolesports', 'Football Manager', 'FIFA16,FIFA', "Assasin'sCreedSyndicate", 'GTAV,GTA5', 'ChibiRobo',\
@@ -11,62 +11,50 @@ trackTweets = ['Fallout4', 'LeagueofLegends,lolesports', 'Football Manager', 'FI
 
 gameNames = ['Grand Theft Auto V', 'Counter-Strike: Global Offensive', 'The Elder Scrolls V: Skyrim', 'Rocket League', 'The Witcher 3: Wild Hunt', 'Trove']
 
-# gtaFile = './tweets/train/gta5Train.json'
-# csFile = './tweets/train/counterstrikeTrain.json'
-# skyrimFile = './tweets/train/skyrimTrain.json'
-# rocketFile = './tweets/train/rocketleagueTrain.json'
-# witcherFile = './tweets/train/witcher3Train.json'
-# troveFile = './tweets/train/troveTrain.json'
 trainFiles = ['./tweets/train/gta5Train.json', './tweets/train/counterstrikeTrain.json', './tweets/train/skyrimTrain.json',\
 './tweets/train/rocketleagueTrain.json', './tweets/train/witcher3Train.json', './tweets/train/troveTrain.json']
 
-# gtaTestFile = './tweets/test/gta5Test.json'
-# csTestFile = './tweets/test/counterstrikeTest.json'
-# skyrimTestFile = './tweets/test/skyrimTest.json'
-# rocketTestFile = './tweets/test/rocketleagueTest.json'
-# witcherTestFile = './tweets/test/witcher3Test.json'
-# troveTestFile = './tweets/test/troveTest.json'
 testFiles = ['./tweets/test/gta5Test.json', './tweets/test/counterstrikeTest.json', './tweets/test/skyrimTest.json',\
 './tweets/test/rocketleagueTest.json', './tweets/test/witcher3Test.json', './tweets/test/troveTest.json']
 
 trainThreshold = time.strptime("Tue Aug 11 00:00:00 +0000 2015", "%a %b %d %H:%M:%S +0000 %Y")
 
 # Download tweets separated into categories/games
-# def downloadTweets():
-# 	api = TwitterAPI(tw.consumer_key, tw.consumer_secret, tw.access_token, tw.access_token_secret)
+def downloadTweets():
+	api = TwitterAPI(tw.consumer_key, tw.consumer_secret, tw.access_token, tw.access_token_secret)
 
-# 	for i in xrange(len(trackTweets)):
-# 		r = api.request('statuses/filter', {'track': trackTweets[i], 'since':2014-07-19})
-# 		# r = api.request('search/tweets', {'q': '#LeagueOfLegends', 'since': '2014-11-03', 'until': '2014-11-11'})
-# 		count = 0
-# 		trainTweets = []
-# 		testTweets = []
+	for i in xrange(len(trackTweets)):
+		r = api.request('statuses/filter', {'track': trackTweets[i], 'since':2014-07-19})
+		# r = api.request('search/tweets', {'q': '#LeagueOfLegends', 'since': '2014-11-03', 'until': '2014-11-11'})
+		count = 0
+		trainTweets = []
+		testTweets = []
 
-# 		trainfilename = 'tweets/train/' + trackTweets[i] + 'Train.json'
-# 		testfilename = 'tweets/test/' + trackTweets[i] + 'Test.json'
-# 		train = open(trainfilename, 'w')
-# 		test = open(testfilename, 'w')
+		trainfilename = 'tweets/train/' + trackTweets[i] + 'Train.json'
+		testfilename = 'tweets/test/' + trackTweets[i] + 'Test.json'
+		train = open(trainfilename, 'w')
+		test = open(testfilename, 'w')
 
-# 		for item in r: #download and save to array
-# 			if count == numTweets: break
-# 			if 'delete' in item: continue
-# 			if count < numTweets / 3:
-# 				trainTweets.append(json.dumps(item))
-# 			else:
-# 				testTweets.append(json.dumps(item))
-# 			count += 1
+		for item in r: #download and save to array
+			if count == numTweets: break
+			if 'delete' in item: continue
+			if count < numTweets / 3:
+				trainTweets.append(json.dumps(item))
+			else:
+				testTweets.append(json.dumps(item))
+			count += 1
 
-# 		train.write("[")
-# 		train.write(",\n".join(trainTweets))
-# 		train.write("]")
-# 		train.close
+		train.write("[")
+		train.write(",\n".join(trainTweets))
+		train.write("]")
+		train.close
 
-# 		test.write("[")
-# 		test.write(",\n".join(testTweets))
-# 		test.write("]")
-# 		test.close
+		test.write("[")
+		test.write(",\n".join(testTweets))
+		test.write("]")
+		test.close
 
-# 	print "SAVED TRAIN AND TEST TWEETS TO FILE"
+	print "SAVED TRAIN AND TEST TWEETS TO FILE"
 
 
 # Read in tweets from the dataset and search for occurrences of the hashtags for each
@@ -75,12 +63,6 @@ trainThreshold = time.strptime("Tue Aug 11 00:00:00 +0000 2015", "%a %b %d %H:%M
 # This is our filtering mechanism for getting tweets older than the time that the
 # TwitterAPI allows for.
 def filterTweetsOnHashtag():
-	# gta = open(gtaFile, 'w')
-	# cs = open(csFile, 'w')
-	# skyrim = open(skyrimFile, 'w')
-	# rocket = open(rocketFile, 'w')
-	# witcher = open(witcherFile, 'w')
-	# trove = open(troveFile, 'w')
 	gta = open(trainFiles[0], 'w')
 	cs = open(trainFiles[1], 'w')
 	skyrim = open(trainFiles[2], 'w')
@@ -235,16 +217,6 @@ def extractFeatures():
 
 
 
-def trainTweets():
-	data = []
-	with open(trainfilename, 'r') as f:
-		data = json.load(f)
-
-
-def testTweets():
-	data = []
-	with open(testfilename, 'r') as f:
-		data = json.load(f)
-
 if __name__ == "__main__":
 	filterTweetsOnHashtag()
+

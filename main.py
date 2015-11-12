@@ -1,45 +1,29 @@
-import sys, os, os.path
+import sys, os, os.path, time
 import json
 import re
 import twitterAccess as tw
 from TwitterAPI import TwitterAPI
 
-numTweets = 10
+numTweets = 1000
 trackTweets = ['Fallout4', 'LeagueofLegends,lolesports', 'Football Manager', 'FIFA16,FIFA', "Assasin'sCreedSyndicate", 'GTAV,GTA5', 'ChibiRobo',\
 'NBALive', 'PlantsVSZombies', 'DarkSouls2,DarkSoulsII', 'DiabloIII,Diablo3', 'Destiny', 'Witcher3', 'RideToHellRetribution', 'Hypervoid', 'Borderlands',\
 'CallofDutyBlackOps3', 'TonyHawkProSkater5', 'Minecraft', 'Skyrim', 'LegendOfZelda', 'Halo5', 'Starcraft2,StarcraftII', 'CounterStrike', 'SonictheHedgehog']
 
-# DEPRECATED - Old method used to download tweets in firehose method
-# def saveTweets():
-# 	api = TwitterAPI(tw.consumer_key, tw.consumer_secret, tw.access_token, tw.access_token_secret)
+gtaFile = './tweets/train/gta5Train.json'
+csFile = './tweets/train/counterstrikeTrain.json'
+skyrimFile = './tweets/train/skyrimTrain.json'
+rocketFile = './tweets/train/rocketleagueTrain.json'
+witcherFile = './tweets/train/witcher3Train.json'
+troveFile = './tweets/train/troveTrain.json'
 
-# 	r = api.request('statuses/filter', {'track': trackTweets[0]})
-# 	count = 0
-# 	trainTweets = []
-# 	testTweets = []
+gtaTestFile = './tweets/test/gta5Test.json'
+csTestFile = './tweets/test/counterstrikeTest.json'
+skyrimTestFile = './tweets/test/skyrimTest.json'
+rocketTestFile = './tweets/test/rocketleagueTest.json'
+witcherTestFile = './tweets/test/witcher3Test.json'
+troveTestFile = './tweets/test/troveTest.json'
 
-# 	train = open(trainfilename, 'w')
-# 	test = open(testfilename, 'w')
-# 	for item in r:
-# 		if count == numTweets: break
-# 		if 'delete' in item:
-# 			continue
-# 		if count < 5:
-# 			trainTweets.append(json.dumps(item))
-# 		else:
-# 			testTweets.append(json.dumps(item))
-# 		count += 1
-
-# 	train.write("[")
-# 	train.write(",\n".join(trainTweets))
-# 	train.write("]")
-# 	train.close
-
-# 	test.write("[")
-# 	test.write(",\n".join(testTweets))
-# 	test.write("]")
-# 	test.close
-# 	print "SAVED TO FILE"
+trainThreshold = time.strptime("Tue Aug 11 00:00:00 +0000 2015", "%a %b %d %H:%M:%S +0000 %Y")
 
 # Download tweets separated into categories/games
 def downloadTweets():
@@ -79,18 +63,25 @@ def downloadTweets():
 	print "SAVED TRAIN AND TEST TWEETS TO FILE"
 
 
-
 # Read in tweets from the dataset and search for occurrences of the hashtags for each
-# of the games in the text. If it appears, write that json object to our outfile so.
+# of the games in the text. If it appears, write that json object to our outfile (either
+# train or test based on the time stamp for the provided tweet).
 # This is our filtering mechanism for getting tweets older than the time that the
 # TwitterAPI allows for.
 def filterTweetsOnHashtag():
-	gta = open('./tweets/gta5.json', 'w')
-	cs = open('./tweets/counterstrike.json', 'w')
-	skyrim = open('./tweets/skyrim.json', 'w')
-	rocket = open('./tweets/rocketleague.json', 'w')
-	witcher = open('./tweets/witcher3.json', 'w')
-	trove = open('./tweets/trove.json', 'w')
+	gta = open(gtaFile, 'w')
+	cs = open(csFile, 'w')
+	skyrim = open(skyrimFile, 'w')
+	rocket = open(rocketFile, 'w')
+	witcher = open(witcherFile, 'w')
+	trove = open(troveFile, 'w')
+
+	gtaTest = open(gtaTestFile, 'w')
+	csTest = open(csTestFile, 'w')
+	skyrimTest = open(skyrimTestFile, 'w')
+	rocketTest = open(rocketTestFile, 'w')
+	witcherTest = open(witcherTestFile, 'w')
+	troveTest = open(troveTestFile, 'w')
 
 	#Go through all of the files and create our outfile
 	for root, _, files in os.walk('./08/'):
@@ -106,28 +97,52 @@ def filterTweetsOnHashtag():
 					text = item['text']
 					if re.findall(r'(#gta5\b|#gtav\b)', text, re.IGNORECASE):
 						print "gta"
-						gta.write(json.dumps(item))
-						gta.write('\n')
+						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+							gta.write(json.dumps(item))
+							gta.write('\n')
+						else:
+							gtaTest.write(json.dumps(item))
+							gtaTest.write('\n')
 					elif re.findall(r'(#counterstrike\b|#csgo\b)', text, re.IGNORECASE):
 						print "cs"
-						cs.write(json.dumps(item))
-						cs.write('\n')
+						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+							cs.write(json.dumps(item))
+							cs.write('\n')
+						else:
+							csTest.write(json.dumps(item))
+							csTest.write('\n')
 					elif re.findall(r'#skyrim\b', text, re.IGNORECASE):
 						print "skyrim"
-						skyrim.write(json.dumps(item))
-						skyrim.write('\n')
+						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+							skyrim.write(json.dumps(item))
+							skyrim.write('\n')
+						else:
+							skyrimTest.write(json.dumps(item))
+							skyrimTest.write('\n')
 					elif re.findall(r'#rocketleague\b', text, re.IGNORECASE):
 						print "rocketleague"
-						rocket.write(json.dumps(item))
-						rocket.write('\n')
+						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+							rocket.write(json.dumps(item))
+							rocket.write('\n')
+						else:
+							rocketTest.write(json.dumps(item))
+							rocketTest.write('\n')
 					elif re.findall(r'#witcher3\b', text, re.IGNORECASE):
 						print "witcher"
-						witcher.write(json.dumps(item))
-						witcher.write('\n')
+						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+							witcher.write(json.dumps(item))
+							witcher.write('\n')
+						else:
+							witcherTest.write(json.dumps(item))
+							witcherTest.write('\n')
 					elif re.findall(r'#trove\b', text, re.IGNORECASE):
 						print "trove"
-						trove.write(json.dumps(item))
-						trove.write('\n')
+						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+							trove.write(json.dumps(item))
+							trove.write('\n')
+						else:
+							troveTest.write(json.dumps(item))
+							troveTest.write('\n')
 
 	gta.close
 	cs.close
@@ -136,8 +151,14 @@ def filterTweetsOnHashtag():
 	witcher.close
 	trove.close
 
-	print "FINISHED FILTERING FILES"
+	gtaTest.close
+	csTest.close
+	skyrimTest.close
+	rocketTest.close
+	witcherTest.close
+	troveTest.close
 
+	print "FINISHED FILTERING FILES"
 
 
 def trainTweets():

@@ -213,7 +213,6 @@ def extractFeatures():
 			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg]
 			formatDate = '08/' + (('0' + str(i+1)) if i+1 < 10 else str(i+1)) + '/15'
 			features.append((feat, playerCounts[countIndex]["Peak Player"][formatDate]))
-		print len(features)
 
 		trainResults[game] = features[:10]
 		testResults[game] = features[10:]

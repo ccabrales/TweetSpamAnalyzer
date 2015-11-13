@@ -4,10 +4,11 @@ import re
 import twitterAccess as tw
 from TwitterAPI import TwitterAPI
 
-numTweets = 1000
-trackTweets = ['Fallout4', 'LeagueofLegends,lolesports', 'Football Manager', 'FIFA16,FIFA', "Assasin'sCreedSyndicate", 'GTAV,GTA5', 'ChibiRobo',\
-'NBALive', 'PlantsVSZombies', 'DarkSouls2,DarkSoulsII', 'DiabloIII,Diablo3', 'Destiny', 'Witcher3', 'RideToHellRetribution', 'Hypervoid', 'Borderlands',\
-'CallofDutyBlackOps3', 'TonyHawkProSkater5', 'Minecraft', 'Skyrim', 'LegendOfZelda', 'Halo5', 'Starcraft2,StarcraftII', 'CounterStrike', 'SonictheHedgehog']
+numTweets = 10000
+trackTweets = ['#Fallout4', '#LeagueofLegends,#lolesports', '#GTAV,#GTA5', '#Witcher3',\
+'#CallofDutyBlackOps3', '#Minecraft', '#Skyrim', '#Halo5', '#CounterStrike,#CSGO', '#Trove']
+tags = '#Fallout4,#LeagueofLegends,#lolesports,#GTAV,#GTA5,\
+##Witcher3,#CallofDutyBlackOps3,#Minecraft,#Skyrim,#Halo5,#CounterStrike,#CSGO,#Trove'
 
 gameNames = ['Grand Theft Auto V', 'Counter-Strike: Global Offensive', 'The Elder Scrolls V: Skyrim', 'Rocket League', 'The Witcher 3: Wild Hunt', 'Trove']
 
@@ -19,40 +20,42 @@ testFiles = ['./tweets/test/gta5Test.json', './tweets/test/counterstrikeTest.jso
 
 trainThreshold = time.strptime("Tue Aug 11 00:00:00 +0000 2015", "%a %b %d %H:%M:%S +0000 %Y")
 
-# Download tweets separated into categories/games
+# Download tweets separated into single archive file for future data purposes
 def downloadTweets():
 	api = TwitterAPI(tw.consumer_key, tw.consumer_secret, tw.access_token, tw.access_token_secret)
 
-	for i in xrange(len(trackTweets)):
-		r = api.request('statuses/filter', {'track': trackTweets[i], 'since':2014-07-19})
-		# r = api.request('search/tweets', {'q': '#LeagueOfLegends', 'since': '2014-11-03', 'until': '2014-11-11'})
-		count = 0
-		trainTweets = []
-		testTweets = []
+	f = open('./archive/' + time.strftime("%b-%d-%Y") + '.json', 'w')
 
-		trainfilename = 'tweets/train/' + trackTweets[i] + 'Train.json'
-		testfilename = 'tweets/test/' + trackTweets[i] + 'Test.json'
-		train = open(trainfilename, 'w')
-		test = open(testfilename, 'w')
+	r = api.request('statuses/filter', {'track': tags})
+	count = 0
+	for item in r:
+		if count % 100 == 0: print count
+		if count == numTweets: break
+		if 'delete' in item: continue
+		f.write(json.dumps(item))
+		f.write('\n')
+		count += 1
 
-		for item in r: #download and save to array
-			if count == numTweets: break
-			if 'delete' in item: continue
-			if count < numTweets / 3:
-				trainTweets.append(json.dumps(item))
-			else:
-				testTweets.append(json.dumps(item))
-			count += 1
+	# counts = collections.Counter()
+	# count = 0
 
-		train.write("[")
-		train.write(",\n".join(trainTweets))
-		train.write("]")
-		train.close
+	# totalGoal = len(trackTweets) * numTweets
 
-		test.write("[")
-		test.write(",\n".join(testTweets))
-		test.write("]")
-		test.close
+	# for item in r: #download and save to array
+	# 	if count % 100 == 0: print count, totalGoal
+	# 	if totalGoal == 0: break
+	# 	if 'delete' in item: continue
+	# 	for game in trackTweets:
+	# 		if any(tag in item['text'] for tag in game.split(',')):
+	# 			if counts[game] < numTweets:
+	# 				counts[game] += 1
+	# 				totalGoal -= 1
+	# 				f.write(json.dumps(item))
+	# 				f.write('\n')
+	# 			break
+	# 	count += 1
+
+	f.close
 
 	print "SAVED TRAIN AND TEST TWEETS TO FILE"
 
@@ -223,5 +226,5 @@ def extractFeatures():
 
 
 if __name__ == "__main__":
-	filterTweetsOnHashtag()
+	downloadTweets()
 

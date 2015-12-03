@@ -4,6 +4,7 @@ import numpy as np
 import main
 import statsmodels.api as sm
 import pandas as pd
+import collections
 
 
 def stackArrays(features):
@@ -49,8 +50,8 @@ def runLinearRegression():
 	# testSize = math.floor(31 / K)
 	X = [i for i in xrange(31)]
 
-	totalError = 0
-	totalPercentError = 0
+	totalError = collections.Counter()
+	totalPercentError = collections.Counter()
 
 	for training, validation in kFoldCrossValidation(X, K):
 		allData = main.extractFeaturesFolding(training, validation)
@@ -98,17 +99,20 @@ def runLinearRegression():
 			       print y_predicted
 			       error = 1.0 * abs(y_predicted - value) / value
 			       percentError.append(error)
-			totalError = totalError + sum(percentError)
-			totalPercentError = totalPercentError + sum(percentError)/len(percentError)
+
+			totalError[game] += sum(percentError)
+			totalPercentError[game] += sum(percentError)/len(percentError)
+
 			print "Game: ", game
 			print "Test Error ", percentError
 			print "Average Error ", sum(percentError)/len(percentError)
 
-	totalError = totalError / K
-	totalPercentError = totalPercentError / K
+	for x in totalError: totalError[x]/=K
+	for x in totalPercentError: totalPercentError[x]/=K
 
-	print "Total Error", totalError
-	print "Total Percent Error", totalPercentError
+	for x in totalError:
+		print "Total Error", x, totalError[x]
+		print "Total Percent Error", x, totalPercentError[x]
 
 # Execute the following
 runLinearRegression()

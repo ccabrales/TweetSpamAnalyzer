@@ -1,11 +1,14 @@
-# Rum Linear Regression on the sets
-import numpy as np
-#import statsmodels.api as sm
- 
-trainingData = dict()
-trainingData['GTAV'] = [([20, 2, 1], 12321), ([10, 4, 3], 142553), ([15, 3, 2], 89247)]
+#Includes linear regression
 
-testData = dict()
+import numpy as np
+import main
+import statsmodels.api as sm
+import pandas as pd 
+
+allData = main.extractFeatures()
+
+trainingData = allData[0]
+testData = allData[1]
 
 def stackArrays(features):
 	numFeatures = len(features[0])
@@ -18,37 +21,70 @@ def stackArrays(features):
 		stacked.append(stack)
 	return stacked 
 
-results = None
-# Train the linear regression model
-for game in trainingData:
-	# Array of tuples ([feature vector], value)
-	numSample = len(trainingData[game])
-	x_train = []
-	y_train = []
-	for feature, value in trainingData[game]:
-		x_train.append(feature)
-		y_train.append(value)
-	x_train = stackArrays(x_train)
-	x_train = sm.add_constant(x_train)
-	model = sm.OLS(y, X)
-	results = model.fit()
-	print(results.summary())
+'''
+y = [1,2,3,4,3,4,5,4,5,5,4,5,4,5,4,5,6,5,4,5,4,3,4]
 
+x = [
+     [4,2,3,4,5,4,5,6,7,4,8,9,8,8,6,6,5,5,5,5,5,5,5],
+     [4,1,2,3,4,5,6,7,5,8,7,8,7,8,7,8,7,7,7,7,7,6,5],
+     [4,1,2,5,6,7,8,9,7,8,7,8,7,7,7,7,7,7,6,6,4,4,4]
+     ]
 
+def reg_m(y, x):
+    ones = np.ones(len(x[0]))
+    X = sm.add_constant(np.column_stack((x[0], ones)))
+    for ele in x[1:]:
+        X = sm.add_constant(np.column_stack((ele, X)))
+    results = sm.OLS(y, X).fit()
+    return results
 
-params = results.params
-constant = params[-1]
-weights = result[:len(params)-1]
-# Test model
-for game in testData:
-	percentError = []
-	for feature, value in testData[game]:
-		# put into regression equation
-		y_predicted = constant
-		for i in range(len(feature)):
-			y_predicted += feature[i]*weights[i]
-		# Determine error
-		error = 1.0 * math.abs(y_predicted - value) / value
-	print "Game: ", game
-	print "Test Error ", percentError
-	print "Average Error ", sum(percentError)/len(percentError) 
+#print reg_m(y, x).summary()
+'''
+
+def runLinearRegression():
+       # Train the linear regression model
+       for game in trainingData:
+               # Array of tuples ([feature vector], value)
+               numSample = len(trainingData[game])
+               x_train = []
+               y_train = []
+
+               for feature, value in trainingData[game]:
+                       x_train.append(feature)
+                       y_train.append(value)
+               x_train = stackArrays(x_train)
+               #x_train = sm.add_constant(x_train)
+               ones = np.ones(len(x_train[0]))
+               X_train = sm.add_constant(np.column_stack((x_train[0], ones)))
+               for ele in x_train[1:]: 
+                       X_train = sm.add_constant(np.column_stack((ele, X_train)))
+
+               model = sm.OLS(y_train, X_train)
+               results = model.fit()
+               print(results.summary())
+
+               #Test
+               params = results.params
+       
+               constant = params[-1]
+       
+               weights = params[1:]
+               print weights
+               # Test model
+               percentError = []
+               for feature, value in testData[game]:
+                       # put into regression equation
+                       #print feature, value
+                       y_predicted = constant
+                       for i in range(len(feature)):
+                               y_predicted += feature[i]*weights[i]
+                       # Determine error
+                       print y_predicted
+                       error = 1.0 * abs(y_predicted - value) / value
+                       percentError.append(error)
+               print "Game: ", game
+               print "Test Error ", percentError
+               print "Average Error ", sum(percentError)/len(percentError) 
+
+# Execute the following
+runLinearRegression()

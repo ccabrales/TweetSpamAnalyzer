@@ -1,8 +1,8 @@
 import sys, os, os.path, time, collections
 import json
 import re
-import twitterAccess as tw
-from TwitterAPI import TwitterAPI
+#import twitterAccess as tw
+#from TwitterAPI import TwitterAPI
 
 numTweets = 10000
 trackTweets = ['#Fallout4', '#LeagueofLegends,#lolesports', '#GTAV,#GTA5', '#Witcher3',\
@@ -177,6 +177,13 @@ def extractFeatures():
 		followerCounts = collections.Counter() # init each day in the set to have 0 follower count
 		retweetCounts = collections.Counter() # init each day in the set to have 0 retweets
 
+		'''
+		Possible new features: Tag all games with the appropriate genres
+		genre = {'GTAV': 'FPS'}
+		nonlinear relationships between number of tweetCounts and number of playerCounts
+		'''
+
+
 		countIndex = [i for i, val in enumerate(playerCounts) if val["Game"] == game][0]
 
 		with open(trainFiles[index]) as d:
@@ -214,6 +221,7 @@ def extractFeatures():
 			followAvg = float(followerCounts[i]) / len(users[i]) if len(users[i]) > 0 else 0
 			retweetAvg = float(retweetCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
 			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg]
+			#feat = [tweetCounts[i]] 	# Baseline
 			formatDate = '08/' + (('0' + str(i+1)) if i+1 < 10 else str(i+1)) + '/15'
 			features.append((feat, playerCounts[countIndex]["Peak Player"][formatDate]))
 

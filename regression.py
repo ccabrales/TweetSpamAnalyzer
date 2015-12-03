@@ -3,12 +3,8 @@
 import numpy as np
 import main
 import statsmodels.api as sm
-import pandas as pd 
+import pandas as pd
 
-allData = main.extractFeatures()
-
-trainingData = allData[0]
-testData = allData[1]
 
 def stackArrays(features):
 	numFeatures = len(features[0])
@@ -41,50 +37,78 @@ def reg_m(y, x):
 #print reg_m(y, x).summary()
 '''
 
+def kFoldCrossValidation(X, K):
+	for k in xrange(K):
+		training = [x for i, x in enumerate(X) if i % K != k]
+		validation = [x for i, x in enumerate(X) if i % K == k]
+		yield training, validation
+
 def runLinearRegression():
-       # Train the linear regression model
-       for game in trainingData:
-               # Array of tuples ([feature vector], value)
-               numSample = len(trainingData[game])
-               x_train = []
-               y_train = []
+	#set up k-folding here
+	K = 6 #number of partitions
+	# testSize = math.floor(31 / K)
+	X = [i for i in xrange(31)]
 
-               for feature, value in trainingData[game]:
-                       x_train.append(feature)
-                       y_train.append(value)
-               x_train = stackArrays(x_train)
-               #x_train = sm.add_constant(x_train)
-               ones = np.ones(len(x_train[0]))
-               X_train = sm.add_constant(np.column_stack((x_train[0], ones)))
-               for ele in x_train[1:]: 
-                       X_train = sm.add_constant(np.column_stack((ele, X_train)))
+	totalError = 0
+	totalPercentError = 0
 
-               model = sm.OLS(y_train, X_train)
-               results = model.fit()
-               print(results.summary())
+	for training, validation in kFoldCrossValidation(X, K):
+		allData = main.extractFeaturesFolding(training, validation)
 
-               #Test
-               params = results.params
-       
-               constant = params[-1]
-       
-               weights = params[1:]
-               print weights
-               # Test model
-               percentError = []
-               for feature, value in testData[game]:
-                       # put into regression equation
-                       #print feature, value
-                       y_predicted = constant
-                       for i in range(len(feature)):
-                               y_predicted += feature[i]*weights[i]
-                       # Determine error
-                       print y_predicted
-                       error = 1.0 * abs(y_predicted - value) / value
-                       percentError.append(error)
-               print "Game: ", game
-               print "Test Error ", percentError
-               print "Average Error ", sum(percentError)/len(percentError) 
+		trainingData = allData[0]
+		testData = allData[1]
+
+		# Train the linear regression model
+		for game in trainingData:
+			# Array of tuples ([feature vector], value)
+			numSample = len(trainingData[game])
+			x_train = []
+			y_train = []
+
+			for feature, value in trainingData[game]:
+			       x_train.append(feature)
+			       y_train.append(value)
+			x_train = stackArrays(x_train)
+			#x_train = sm.add_constant(x_train)
+			ones = np.ones(len(x_train[0]))
+			X_train = sm.add_constant(np.column_stack((x_train[0], ones)))
+			for ele in x_train[1:]: 
+			       X_train = sm.add_constant(np.column_stack((ele, X_train)))
+
+			model = sm.OLS(y_train, X_train)
+			results = model.fit()
+			print(results.summary())
+
+			#Test
+			params = results.params
+
+			constant = params[-1]
+
+			weights = params[1:]
+			print weights
+			# Test model
+			percentError = []
+			for feature, value in testData[game]:
+			       # put into regression equation
+			       #print feature, value
+			       y_predicted = constant
+			       for i in range(len(feature)):
+			               y_predicted += feature[i]*weights[i]
+			       # Determine error
+			       print y_predicted
+			       error = 1.0 * abs(y_predicted - value) / value
+			       percentError.append(error)
+			totalError = totalError + sum(percentError)
+			totalPercentError = totalPercentError + sum(percentError)/len(percentError)
+			print "Game: ", game
+			print "Test Error ", percentError
+			print "Average Error ", sum(percentError)/len(percentError)
+
+	totalError = totalError / K
+	totalPercentError = totalPercentError / K
+
+	print "Total Error", totalError
+	print "Total Percent Error", totalPercentError
 
 # Execute the following
 runLinearRegression()

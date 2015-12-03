@@ -1,8 +1,8 @@
 import sys, os, os.path, time, collections
 import json
 import re
-#import twitterAccess as tw
-#from TwitterAPI import TwitterAPI
+import twitterAccess as tw
+from TwitterAPI import TwitterAPI
 
 numTweets = 10000
 trackTweets = ['#Fallout4', '#LeagueofLegends,#lolesports', '#GTAV,#GTA5', '#Witcher3',\
@@ -235,7 +235,7 @@ def extractFeatures():
 
 
 #Extract features from the files for each game, for use with folding
-def extractFeaturesFolding():
+def extractFeaturesFolding(training, validation):
 	trainResults = {}
 	testResults = {}
 
@@ -277,8 +277,8 @@ def extractFeaturesFolding():
 			features.append((feat, playerCounts[countIndex]["Peak Player"][formatDate]))
 
 		#take only the days that we are currently taking a look at
-		trainResults[game] = features[:10]
-		testResults[game] = features[10:]
+		trainResults[game] = [features[i] for i in training]
+		testResults[game] = [features[i] for i in validation]
 
 	return (trainResults, testResults)
 

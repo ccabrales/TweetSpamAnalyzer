@@ -18,6 +18,9 @@ trainFiles = ['./tweets/train/gta5Train.json', './tweets/train/counterstrikeTrai
 testFiles = ['./tweets/test/gta5Test.json', './tweets/test/counterstrikeTest.json', './tweets/test/skyrimTest.json',\
 './tweets/test/rocketleagueTest.json', './tweets/test/witcher3Test.json', './tweets/test/troveTest.json']
 
+files = ['./tweets/gta5.json', './tweets/counterstrike.json', './tweets/skyrim.json',\
+'./tweets/rocketleague.json', './tweets/witcher3.json', './tweets/trove.json']
+
 foldingFiles = ['./tweets/k-folding/counterstrike.json', './tweets/k-folding/gta5.json', './tweets/k-folding/rocketleague.json',\
 './tweets/k-folding/skyrim.json', './tweets/k-folding/witcher3.json', './tweets/k-folding/trove.json']
 
@@ -69,22 +72,22 @@ def downloadTweets():
 # This is our filtering mechanism for getting tweets older than the time that the
 # TwitterAPI allows for.
 def filterTweetsOnHashtag():
-	gta = open(trainFiles[0], 'w')
-	cs = open(trainFiles[1], 'w')
-	skyrim = open(trainFiles[2], 'w')
-	rocket = open(trainFiles[3], 'w')
-	witcher = open(trainFiles[4], 'w')
-	trove = open(trainFiles[5], 'w')
+	gta = open(files[0], 'w')
+	cs = open(files[1], 'w')
+	skyrim = open(files[2], 'w')
+	rocket = open(files[3], 'w')
+	witcher = open(files[4], 'w')
+	trove = open(files[5], 'w')
 
-	gtaTest = open(testFiles[0], 'w')
-	csTest = open(testFiles[1], 'w')
-	skyrimTest = open(testFiles[2], 'w')
-	rocketTest = open(testFiles[3], 'w')
-	witcherTest = open(testFiles[4], 'w')
-	troveTest = open(testFiles[5], 'w')
+	# gtaTest = open(testFiles[0], 'w')
+	# csTest = open(testFiles[1], 'w')
+	# skyrimTest = open(testFiles[2], 'w')
+	# rocketTest = open(testFiles[3], 'w')
+	# witcherTest = open(testFiles[4], 'w')
+	# troveTest = open(testFiles[5], 'w')
 
 	#Go through all of the files and create our outfile
-	for root, _, files in os.walk('./08/'):
+	for root, _, files in os.walk('./07/'):
 		for f in files:
 			if not f.endswith(".json"): continue
 
@@ -99,52 +102,64 @@ def filterTweetsOnHashtag():
 					text = item['text']
 					if re.findall(r'(#gta5\b|#gtav\b)', text, re.IGNORECASE):
 						print "gta"
-						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
-							gta.write(json.dumps(item))
-							gta.write('\n')
-						else:
-							gtaTest.write(json.dumps(item))
-							gtaTest.write('\n')
+						gta.write(json.dumps(item))
+						gta.write('\n')
+						# if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+						# 	gta.write(json.dumps(item))
+						# 	gta.write('\n')
+						# else:
+						# 	gtaTest.write(json.dumps(item))
+						# 	gtaTest.write('\n')
 					elif re.findall(r'(#counterstrike\b|#csgo\b)', text, re.IGNORECASE):
 						print "cs"
-						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
-							cs.write(json.dumps(item))
-							cs.write('\n')
-						else:
-							csTest.write(json.dumps(item))
-							csTest.write('\n')
+						cs.write(json.dumps(item))
+						cs.write('\n')
+						# if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+						# 	cs.write(json.dumps(item))
+						# 	cs.write('\n')
+						# else:
+						# 	csTest.write(json.dumps(item))
+						# 	csTest.write('\n')
 					elif re.findall(r'#skyrim\b', text, re.IGNORECASE):
 						print "skyrim"
-						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
-							skyrim.write(json.dumps(item))
-							skyrim.write('\n')
-						else:
-							skyrimTest.write(json.dumps(item))
-							skyrimTest.write('\n')
+						skyrim.write(json.dumps(item))
+						skyrim.write('\n')
+						# if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+						# 	skyrim.write(json.dumps(item))
+						# 	skyrim.write('\n')
+						# else:
+						# 	skyrimTest.write(json.dumps(item))
+						# 	skyrimTest.write('\n')
 					elif re.findall(r'#rocketleague\b', text, re.IGNORECASE):
 						print "rocketleague"
-						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
-							rocket.write(json.dumps(item))
-							rocket.write('\n')
-						else:
-							rocketTest.write(json.dumps(item))
-							rocketTest.write('\n')
+						rocket.write(json.dumps(item))
+						rocket.write('\n')
+						# if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+						# 	rocket.write(json.dumps(item))
+						# 	rocket.write('\n')
+						# else:
+						# 	rocketTest.write(json.dumps(item))
+						# 	rocketTest.write('\n')
 					elif re.findall(r'#witcher3\b', text, re.IGNORECASE):
 						print "witcher"
-						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
-							witcher.write(json.dumps(item))
-							witcher.write('\n')
-						else:
-							witcherTest.write(json.dumps(item))
-							witcherTest.write('\n')
+						witcher.write(json.dumps(item))
+						witcher.write('\n')
+						# if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+						# 	witcher.write(json.dumps(item))
+						# 	witcher.write('\n')
+						# else:
+						# 	witcherTest.write(json.dumps(item))
+						# 	witcherTest.write('\n')
 					elif re.findall(r'#trove\b', text, re.IGNORECASE):
 						print "trove"
-						if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
-							trove.write(json.dumps(item))
-							trove.write('\n')
-						else:
-							troveTest.write(json.dumps(item))
-							troveTest.write('\n')
+						trove.write(json.dumps(item))
+						trove.write('\n')
+						# if time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y") <= trainThreshold: #put into train
+						# 	trove.write(json.dumps(item))
+						# 	trove.write('\n')
+						# else:
+						# 	troveTest.write(json.dumps(item))
+						# 	troveTest.write('\n')
 
 	gta.close
 	cs.close
@@ -153,12 +168,12 @@ def filterTweetsOnHashtag():
 	witcher.close
 	trove.close
 
-	gtaTest.close
-	csTest.close
-	skyrimTest.close
-	rocketTest.close
-	witcherTest.close
-	troveTest.close
+	# gtaTest.close
+	# csTest.close
+	# skyrimTest.close
+	# rocketTest.close
+	# witcherTest.close
+	# troveTest.close
 
 	print "FINISHED FILTERING FILES"
 

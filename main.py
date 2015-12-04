@@ -18,7 +18,7 @@ trainFiles = ['./tweets/train/gta5Train.json', './tweets/train/counterstrikeTrai
 testFiles = ['./tweets/test/gta5Test.json', './tweets/test/counterstrikeTest.json', './tweets/test/skyrimTest.json',\
 './tweets/test/rocketleagueTest.json', './tweets/test/witcher3Test.json', './tweets/test/troveTest.json']
 
-files = ['./tweets/gta5.json', './tweets/counterstrike.json', './tweets/skyrim.json',\
+gameFiles = ['./tweets/gta5.json', './tweets/counterstrike.json', './tweets/skyrim.json',\
 './tweets/rocketleague.json', './tweets/witcher3.json', './tweets/trove.json']
 
 foldingFiles = ['./tweets/k-folding/counterstrike.json', './tweets/k-folding/gta5.json', './tweets/k-folding/rocketleague.json',\
@@ -72,12 +72,12 @@ def downloadTweets():
 # This is our filtering mechanism for getting tweets older than the time that the
 # TwitterAPI allows for.
 def filterTweetsOnHashtag():
-	gta = open(files[0], 'w')
-	cs = open(files[1], 'w')
-	skyrim = open(files[2], 'w')
-	rocket = open(files[3], 'w')
-	witcher = open(files[4], 'w')
-	trove = open(files[5], 'w')
+	gta = open(gameFiles[0], 'w')
+	cs = open(gameFiles[1], 'w')
+	skyrim = open(gameFiles[2], 'w')
+	rocket = open(gameFiles[3], 'w')
+	witcher = open(gameFiles[4], 'w')
+	trove = open(gameFiles[5], 'w')
 
 	# gtaTest = open(testFiles[0], 'w')
 	# csTest = open(testFiles[1], 'w')

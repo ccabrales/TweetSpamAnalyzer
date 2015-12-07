@@ -250,7 +250,7 @@ def extractFeatures():
 
 
 #Extract features from the files for each game, for use with folding
-def extractFeaturesFolding(training, validation):
+def extractFeaturesFolding(training, validation, totRange):
 	trainResults = {}
 	testResults = {}
 
@@ -260,7 +260,7 @@ def extractFeaturesFolding(training, validation):
 
 	for index, game in enumerate(gameNames):
 		features = []
-		users = [set()] * 31 # init each day in the set to have empty set of names
+		users = [set()] * totRange # init each day in the set to have empty set of names
 		tweetCounts = collections.Counter() # init each day in the set to have 0 tweets
 		favoriteCounts = collections.Counter() # init each day in the set to have 0 follower count
 		followerCounts = collections.Counter() # init each day in the set to have 0 follower count
@@ -273,6 +273,8 @@ def extractFeaturesFolding(training, validation):
 				item = json.loads(line)
 				t = time.strptime(item['created_at'], "%a %b %d %H:%M:%S +0000 %Y")
 				day = t.tm_mday - 1 #get day minus one for index
+				if t.tm_mon == 8: #If in month 8, adjust the day by 31 days (month in this case)
+					day += 31
 
 				if item['user']['screen_name'] not in users[day]:
 					retweetCounts[day] += item['retweet_count']
@@ -283,12 +285,14 @@ def extractFeaturesFolding(training, validation):
 				followerCounts[day] += item['user']['followers_count']
 
 		# Build the feature vector for each day
-		for i in xrange(31):
+		for i in xrange(totRange):
 			favAvg = float(favoriteCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
 			followAvg = float(followerCounts[i]) / len(users[i]) if len(users[i]) > 0 else 0
 			retweetAvg = float(retweetCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
 			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg]
-			formatDate = '08/' + (('0' + str(i+1)) if i+1 < 10 else str(i+1)) + '/15'
+			day = i+1 if i < 31 else (i-31+1)
+			# formatDate = '07/' if i < 31 else '08/' + (('0' + str(i+1)) if i+1 < 10 else str(i+1)) + '/15'
+			formatDate = '07/' if i < 31 else '08/' + (('0' + str(day)) if day < 10 else str(day)) + '/15'
 			features.append((feat, playerCounts[countIndex]["Peak Player"][formatDate]))
 
 		#take only the days that we are currently taking a look at

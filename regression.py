@@ -47,14 +47,15 @@ def kFoldCrossValidation(X, K):
 def runLinearRegression():
 	#set up k-folding here
 	K = 6 #number of partitions
+	totRange = 62
 	# testSize = math.floor(31 / K)
-	X = [i for i in xrange(31)]
+	X = [i for i in xrange(totRange)]
 
 	totalError = collections.Counter()
 	totalPercentError = collections.Counter()
 
 	for training, validation in kFoldCrossValidation(X, K):
-		allData = main.extractFeaturesFolding(training, validation)
+		allData = main.extractFeaturesFolding(training, validation, totRange)
 
 		trainingData = allData[0]
 		testData = allData[1]

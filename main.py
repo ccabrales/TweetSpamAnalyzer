@@ -292,7 +292,7 @@ def extractFeaturesFolding(training, validation, totRange):
 			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg]
 			day = i+1 if i < 31 else (i-31+1)
 			# formatDate = '07/' if i < 31 else '08/' + (('0' + str(i+1)) if i+1 < 10 else str(i+1)) + '/15'
-			formatDate = '07/' if i < 31 else '08/' + (('0' + str(day)) if day < 10 else str(day)) + '/15'
+			formatDate = ('07/' if i < 31 else '08/') + (('0' + str(day)) if day < 10 else str(day)) + '/15'
 			features.append((feat, playerCounts[countIndex]["Peak Player"][formatDate]))
 
 		#take only the days that we are currently taking a look at

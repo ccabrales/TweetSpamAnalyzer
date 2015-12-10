@@ -1,8 +1,11 @@
 import sys, os, os.path, time, collections
+import math
 import json
 import re
+import sentiment
 import twitterAccess as tw
 from TwitterAPI import TwitterAPI
+
 
 numTweets = 10000
 trackTweets = ['#Fallout4', '#LeagueofLegends,#lolesports', '#GTAV,#GTA5', '#Witcher3',\
@@ -250,7 +253,7 @@ def extractFeatures():
 
 
 #Extract features from the files for each game, for use with folding
-def extractFeaturesFolding(training, validation, totRange):
+def extractFeaturesFolding(training, validation, totRange, nltkClassifier):
 	trainResults = {}
 	testResults = {}
 
@@ -265,7 +268,8 @@ def extractFeaturesFolding(training, validation, totRange):
 		favoriteCounts = collections.Counter() # init each day in the set to have 0 follower count
 		followerCounts = collections.Counter() # init each day in the set to have 0 follower count
 		retweetCounts = collections.Counter() # init each day in the set to have 0 retweets
-
+		sentimentPolarity = collections.Counter() # init each day in the set to have 0 sum polarity
+		posCounts = collections.Counter() # init each day in the set ot have 0 positive polarity tweets
 		countIndex = [i for i, val in enumerate(playerCounts) if val["Game"] == game][0]
 
 		with open(foldingFiles[index]) as d:
@@ -279,17 +283,21 @@ def extractFeaturesFolding(training, validation, totRange):
 				if item['user']['screen_name'] not in users[day]:
 					retweetCounts[day] += item['retweet_count']
 					users[day].add(item['user']['screen_name'])
-
+				tweet = item['text']
 				tweetCounts[day] += 1 #increment tweet counts for this day
 				favoriteCounts[day] += item['favorite_count']
 				followerCounts[day] += item['user']['followers_count']
-
+				sentimentPolarity[day] += sentiment.classifyTweet(nltkClassifier, tweet)
+				if sentiment.classifyTweet(nltkClassifier,tweet) == 4:
+					posCounts[day] += 1 
 		# Build the feature vector for each day
 		for i in xrange(totRange):
+			#logTweets = math.log(tweetCounts[i]) if tweetCounts[i] > 0 else 0
 			favAvg = float(favoriteCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
 			followAvg = float(followerCounts[i]) / len(users[i]) if len(users[i]) > 0 else 0
 			retweetAvg = float(retweetCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
-			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg]
+			sentPol = float(posCounts[i] / tweetCounts[i]) if tweetCounts[i] > 0 else 0
+			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg, sentPol]
 			day = i+1 if i < 31 else (i-31+1)
 			# formatDate = '07/' if i < 31 else '08/' + (('0' + str(i+1)) if i+1 < 10 else str(i+1)) + '/15'
 			formatDate = ('07/' if i < 31 else '08/') + (('0' + str(day)) if day < 10 else str(day)) + '/15'

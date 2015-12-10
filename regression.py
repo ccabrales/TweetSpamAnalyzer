@@ -1,5 +1,5 @@
 #Includes linear regression
-
+import sentiment
 import numpy as np
 import main
 import statsmodels.api as sm
@@ -53,9 +53,11 @@ def runLinearRegression():
 
 	totalError = collections.Counter()
 	totalPercentError = collections.Counter()
+	featureList = []
+	nltkClassifier = sentiment.trainClassifier(featureList)
 
 	for training, validation in kFoldCrossValidation(X, K):
-		allData = main.extractFeaturesFolding(training, validation, totRange)
+		allData = main.extractFeaturesFolding(training, validation, totRange, nltkClassifier)
 
 		trainingData = allData[0]
 		testData = allData[1]

@@ -2,6 +2,8 @@ import nltk as nltk
 import csv
 import re
 
+# Code based on implementation shown on "http://ravikiranj.net/posts/2012/code/how-build-twitter-sentiment-analyzer/#sampletweets-csv"
+
 trainFile = "./sentiment_data/training.1600000.processed.noemoticon.csv"
 featureList = []
 
@@ -10,6 +12,7 @@ def getFeatureVector(tweet):
 	return featureVector
 
 def processTweet(tweet):
+	# Borrowed from 
 	# Convert to lower case
 	tweet = tweet.lower() 
 	# Replace #word with word

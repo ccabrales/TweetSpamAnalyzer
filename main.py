@@ -3,7 +3,7 @@ import math
 import json
 import re
 import sentiment
-import twitterAccess as tw
+#import twitterAccess as tw
 from TwitterAPI import TwitterAPI
 
 
@@ -241,8 +241,8 @@ def extractFeatures():
 			favAvg = float(favoriteCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
 			followAvg = float(followerCounts[i]) / len(users[i]) if len(users[i]) > 0 else 0
 			retweetAvg = float(retweetCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
-			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg]
-			#feat = [tweetCounts[i]] 	# Baseline
+			#feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg]
+			feat = [tweetCounts[i]] 	# Baseline
 			formatDate = '08/' + (('0' + str(i+1)) if i+1 < 10 else str(i+1)) + '/15'
 			features.append((feat, playerCounts[countIndex]["Peak Player"][formatDate]))
 
@@ -297,7 +297,9 @@ def extractFeaturesFolding(training, validation, totRange, nltkClassifier):
 			followAvg = float(followerCounts[i]) / len(users[i]) if len(users[i]) > 0 else 0
 			retweetAvg = float(retweetCounts[i]) / tweetCounts[i] if tweetCounts[i] > 0 else 0
 			sentPol = float(posCounts[i] / tweetCounts[i]) if tweetCounts[i] > 0 else 0
-			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg, sentPol]
+			#feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg, sentPol, tweetCounts[i]**2]
+			#feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg, sentPol, tweetCounts[i] * favAvg]
+			feat = [tweetCounts[i], len(users[i]), favAvg, followAvg, retweetAvg, sentPol, followAvg * favAvg]
 			day = i+1 if i < 31 else (i-31+1)
 			# formatDate = '07/' if i < 31 else '08/' + (('0' + str(i+1)) if i+1 < 10 else str(i+1)) + '/15'
 			formatDate = ('07/' if i < 31 else '08/') + (('0' + str(day)) if day < 10 else str(day)) + '/15'

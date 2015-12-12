@@ -1,0 +1,22 @@
+documenting what everything is and what commands you ran.
+This folder contains the data we used for our project, as follows:
+- All .json files (counterstrike, gta5, rocketleague, skyrim, trove, witcher3)
+	- Contain every tweet from July to August 2015 matching the hashtags for the respective games, scraped from the entire month's Tweets. Unaltered Tweets still contain metadata.
+	- Used to build feature vectors for the linear regression model
+- sentiment_data.csv
+	- Labeled tweets with sentiment value according to emoticons in the text
+	- Only included a subset of the data to keep within space constraints
+
+
+Packages Needed to Run:
+- numpy
+- statsmodel
+- pandas
+- twitterAccess
+- TwitterAPI
+- nltk
+
+
+How to Run:
+- Just run the command "python regression.py"
+- It will run and print all of the results out

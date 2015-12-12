@@ -1,4 +1,3 @@
-documenting what everything is and what commands you ran.
 This folder contains the data we used for our project, as follows:
 - All .json files (counterstrike, gta5, rocketleague, skyrim, trove, witcher3)
 	- Contain every tweet from July to August 2015 matching the hashtags for the respective games, scraped from the entire month's Tweets. Unaltered Tweets still contain metadata.
